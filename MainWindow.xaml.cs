@@ -361,10 +361,12 @@ namespace PolarisBiosEditor
 
                         atom_sclk_entries[i].ulSclk = (UInt32)mhz;
                         atom_vddc_entries[atom_sclk_entries[i].ucVddInd].usVdd = (UInt16)mv;
+                        /*
                         if (mv < 0xFF00)
                         {
                             atom_sclk_entries[i].usVddcOffset = 0;
                         }
+                        */
                     }
 
                     for (var i = 0; i < tableMEMORY.Items.Count; i++)
