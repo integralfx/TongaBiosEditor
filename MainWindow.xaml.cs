@@ -162,6 +162,8 @@ namespace PolarisBiosEditor
                                     break;
                                 }
                             }
+
+                            vram_ic_timing_map = new int[atom_vram_timing_entries.Length];
                         }
 
                         init_table_rom();
@@ -460,6 +462,8 @@ namespace PolarisBiosEditor
                     NAME = "Type",
                     VALUE = "0x" + vram.ucMemoryType.ToString("X")
                 });
+
+                show_selected_ic_straps();
             }
         }
 
@@ -838,12 +842,26 @@ namespace PolarisBiosEditor
             for (var i = 0; i < atom_vram_info.ucNumOfVRAMModule; i++)
             {
                 if (atom_vram_entries[i].ucMemoryVenderID == 0)
+                {
                     listVRAM.Items.Add("Auto detect");
-                else listVRAM.Items.Add(Encoding.UTF8.GetString(atom_vram_entries[i].strMemPNString).Substring(0, 11));
+
+                    // no straps for auto detect
+                    vram_ic_timing_map[i] = -1;
+                }
+                else
+                {
+                    listVRAM.Items.Add(
+                        Encoding.UTF8.GetString(atom_vram_entries[i].strMemPNString).Substring(0, 11)
+                    );
+
+                    vram_ic_timing_map[i] = i;
+                }
             }
             listVRAM.SelectedIndex = 0;
             atom_vram_index = listVRAM.SelectedIndex;
 
+
+            /*
             tableVRAM_TIMING.Items.Clear();
             foreach (var e in atom_vram_timing_entries)
             {
@@ -855,6 +873,34 @@ namespace PolarisBiosEditor
                     MHZ = freq / 100,
                     VALUE = ByteArrayToString(e.ucLatency)
                 });
+            }
+            */
+
+            show_selected_ic_straps();
+        }
+
+        // shows the straps for atom_vram_index
+        private void show_selected_ic_straps()
+        {
+            tableVRAM_TIMING.Items.Clear();
+
+            int index = vram_ic_timing_map[atom_vram_index];
+            if (index != -1)
+            {
+                foreach (var e in atom_vram_timing_entries)
+                {
+                    if (e.ucIndex == index)
+                    {
+                        uint freq = BitConverter.ToUInt32(e.ulClkRange.Concat(new byte[] { 0x0 }).ToArray(), 0);
+
+                        tableVRAM_TIMING.Items.Add(new
+                        {
+                            INDEX = e.ucIndex,
+                            MHZ = freq / 100,
+                            VALUE = ByteArrayToString(e.ucLatency)
+                        });
+                    }
+                }
             }
         }
 
@@ -898,6 +944,7 @@ namespace PolarisBiosEditor
         ATOM_VRAM_ENTRY[] atom_vram_entries;
         ATOM_VRAM_TIMING_ENTRY[] atom_vram_timing_entries;
         int atom_vram_index = 0;
+        int[] vram_ic_timing_map;       // maps the ic index to the atom_vram_timing_entries index
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         unsafe struct ATOM_COMMON_TABLE_HEADER
