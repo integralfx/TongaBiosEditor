@@ -80,6 +80,8 @@ namespace PolarisBiosEditor
                     deviceID = atom_rom_header.usDeviceID.ToString("X");
                     fixChecksum(false);
 
+                    txtBiosFile.Text = openFileDialog.SafeFileName;
+
                     MessageBoxResult msgSuported = MessageBoxResult.Yes;
                     if (!supportedDeviceID.Contains(deviceID))
                     {

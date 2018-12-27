@@ -265,6 +265,7 @@
                 </Grid>
             </Grid>
         </GroupBox>
+        <TextBlock x:Name="txtBiosFile" HorizontalAlignment="Left" Margin="196,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="299"/>
 
     </Grid>
 </Window>
